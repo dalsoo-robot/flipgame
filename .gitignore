@@ -5,3 +5,11 @@ out/
 
 # Local Netlify folder
 .netlify
+
+# Development Screenshots/Logs
+/*.png
+!/assets/**/*.png
+!/src/assets/**/*.png
+
+# Agent artifacts
+.playwright-mcp/
