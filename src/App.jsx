@@ -12,9 +12,10 @@ import memoryFlipLogo from './assets/logo/memory-flip-logo.png';
 import memoryFlipIntro from './assets/logo/memory-flip-intro.webm';
 import memoryFlipLoop from './assets/logo/memory-flip-loop.webm';
 
-// Safari plays VP9 WebM but drops the alpha channel (renders black background),
-// so play() succeeds and the onError fallback never fires — route it to the PNG.
-const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+// Safari/WebKit plays VP9 WebM but drops the alpha channel (renders black background),
+// so play() succeeds and the onError fallback never fires. Allowlist the engines known
+// to decode WebM alpha (desktop Chromium + Firefox); everything else gets the PNG.
+const canPlayAlphaWebm = /(Chrome|Chromium|Edg|Firefox)\//.test(navigator.userAgent);
 import cardMetallicBase from './assets/cards/card-metallic-base.svg';
 import cardMetallicSheen from './assets/cards/card-metallic-sheen.webm';
 import cardSemiconductorGold from './assets/cards/card-semiconductor-gold.svg';
@@ -158,9 +159,9 @@ export default function App() {
     assets.push({ type: 'image', src: memoryFlipLogo });
     assets.push({ type: 'image', src: cardMetallicBase });
     assets.push({ type: 'image', src: cardSemiconductorGold });
-    // Logo videos (desktop only — mobile and Safari use static PNG already preloaded above)
+    // Logo videos (desktop Chromium/Firefox only — everyone else uses the static PNG preloaded above)
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768;
-    if (!isMobile && !isSafari) {
+    if (!isMobile && canPlayAlphaWebm) {
       assets.push({ type: 'video', src: memoryFlipIntro });
       assets.push({ type: 'video', src: memoryFlipLoop });
     }
@@ -801,7 +802,7 @@ export default function App() {
         </div>
         <div className="start-screen__title-section">
           <h1 className="start-screen__title start-screen__title--logo">
-            {!prefersReducedMotion.current && !isSafari && !(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768) ? (
+            {!prefersReducedMotion.current && canPlayAlphaWebm && !(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768) ? (
               <>
                 {/* Desktop: WebM intro → loop */}
                 <video
