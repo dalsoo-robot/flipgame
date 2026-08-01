@@ -11,7 +11,8 @@ import samsungLogo from './assets/logo/Samsung_Orig_Wordmark_WHITE_RGB.png';
 import memoryFlipLogo from './assets/logo/memory-flip-logo.png';
 import memoryFlipIntro from './assets/logo/memory-flip-intro.webm';
 import memoryFlipLoop from './assets/logo/memory-flip-loop.webm';
-import memoryFlipLoopWebp from './assets/logo/memory-flip-loop.webp';
+// APNG, not plain PNG: Safari renders APNG alpha correctly where its animated-WebP decoder can black-fill
+import memoryFlipLoopAnim from './assets/logo/memory-flip-loop-anim.png';
 
 // Safari/WebKit plays VP9 WebM but drops the alpha channel (renders black background),
 // so play() succeeds and the onError fallback never fires. Allowlist the engines known
@@ -163,7 +164,7 @@ export default function App() {
     // Logo animation (desktop only): WebM videos for Chromium/Firefox, animated WebP for Safari & co
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768;
     if (!isMobile && !canPlayAlphaWebm) {
-      assets.push({ type: 'image', src: memoryFlipLoopWebp });
+      assets.push({ type: 'image', src: memoryFlipLoopAnim });
     }
     if (!isMobile && canPlayAlphaWebm) {
       assets.push({ type: 'video', src: memoryFlipIntro });
@@ -853,7 +854,7 @@ export default function App() {
                 </video>
                 {/* Animated WebP fallback if video fails */}
                 <img
-                  src={memoryFlipLoopWebp}
+                  src={memoryFlipLoopAnim}
                   alt="Memory Flip"
                   width={800}
                   height={360}
@@ -864,7 +865,7 @@ export default function App() {
             ) : (
               // Safari & co: animated WebP has alpha where WebM doesn't; static PNG for mobile / reduced motion
               <img
-                src={!prefersReducedMotion.current && !(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768) ? memoryFlipLoopWebp : memoryFlipLogo}
+                src={!prefersReducedMotion.current && !(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768) ? memoryFlipLoopAnim : memoryFlipLogo}
                 alt="Memory Flip"
                 width={800}
                 height={360}
