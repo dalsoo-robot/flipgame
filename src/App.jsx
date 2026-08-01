@@ -11,6 +11,10 @@ import samsungLogo from './assets/logo/Samsung_Orig_Wordmark_WHITE_RGB.png';
 import memoryFlipLogo from './assets/logo/memory-flip-logo.png';
 import memoryFlipIntro from './assets/logo/memory-flip-intro.webm';
 import memoryFlipLoop from './assets/logo/memory-flip-loop.webm';
+
+// Safari plays VP9 WebM but drops the alpha channel (renders black background),
+// so play() succeeds and the onError fallback never fires — route it to the PNG.
+const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 import cardMetallicBase from './assets/cards/card-metallic-base.svg';
 import cardMetallicSheen from './assets/cards/card-metallic-sheen.webm';
 import cardSemiconductorGold from './assets/cards/card-semiconductor-gold.svg';
@@ -154,9 +158,9 @@ export default function App() {
     assets.push({ type: 'image', src: memoryFlipLogo });
     assets.push({ type: 'image', src: cardMetallicBase });
     assets.push({ type: 'image', src: cardSemiconductorGold });
-    // Logo videos (desktop only — mobile uses static PNG already preloaded above)
+    // Logo videos (desktop only — mobile and Safari use static PNG already preloaded above)
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768;
-    if (!isMobile) {
+    if (!isMobile && !isSafari) {
       assets.push({ type: 'video', src: memoryFlipIntro });
       assets.push({ type: 'video', src: memoryFlipLoop });
     }
@@ -797,7 +801,7 @@ export default function App() {
         </div>
         <div className="start-screen__title-section">
           <h1 className="start-screen__title start-screen__title--logo">
-            {!prefersReducedMotion.current && !(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768) ? (
+            {!prefersReducedMotion.current && !isSafari && !(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768) ? (
               <>
                 {/* Desktop: WebM intro → loop */}
                 <video
